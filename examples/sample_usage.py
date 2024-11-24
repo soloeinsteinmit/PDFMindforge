@@ -22,10 +22,7 @@ def single_pdf_example():
     output_dir = "path/to/output/directory"
     
     # Convert PDF to markdown
-    processor.process_pdf_to_md(input_pdf, output_dir)
-    
-    # Create a ZIP file of the processed content
-    processor.create_zip(output_dir, f"{output_dir}.zip")
+    processor.process_pdf_to_md(input_pdf, output_dir, create_zip=False)
 
 def batch_processing_example():
     """Example of processing multiple PDF files in a directory"""
