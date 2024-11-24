@@ -4,7 +4,8 @@ Main processor class for PDFMindforge.
 
 import os
 import subprocess
-from typing import List, Optional
+import multiprocessing
+from typing import List, Optional, Dict
 
 from ..utils.gpu import GPUManager
 from ..utils.io import FileManager
@@ -20,28 +21,41 @@ class PDFProcessor:
     - Conversion to markdown using marker_single
     - ZIP file creation for processed files
     - CUDA memory management for GPU resources
+    
+    Attributes:
+        chunk_size: Number of pages per chunk when splitting large PDFs
+        batch_multiplier: Multiplier for batch processing. Higher numbers will take more VRAM, but process faster.
+                        Default value of 2 will use ~6GB of VRAM (2x the base 3GB requirement)
+        langs: Optional comma-separated list of languages for OCR. Required only if using tesseract
+        clear_cuda_cache: Whether to clear CUDA cache on initialization
+        min_pages_for_split: Minimum number of pages before splitting a PDF
+        max_pages: Maximum number of pages to process. None means process entire document
+        start_page: Page number to start processing from. None means start from first page
+        workers: Number of PDFs to process in parallel. Each worker uses ~5GB VRAM peak, 3.5GB average
+        min_length: Minimum number of characters required in PDF for processing. If you're processing a lot of pdfs, *marker* recommends setting this to avoid OCRing pdfs that are mostly images. (slows everything down)
     """
     
     def __init__(
         self,
         chunk_size: int = 100,
         batch_multiplier: int = 2,
-        langs: str = "English",
+        langs: Optional[str] = "English",
         clear_cuda_cache: bool = True,
-        min_pages_for_split: int = 200
+        min_pages_for_split: int = 200,
+        max_pages: Optional[int] = None,
+        start_page: Optional[int] = None,
+        workers: int = 1,
+        min_length: Optional[int] = None
     ):
         """
         Initialize the PDF processor with specified parameters.
-        
-        Args:
-            chunk_size: Number of pages per chunk when splitting large PDFs
-            batch_multiplier: Multiplier for batch processing
-            langs: Language specification for processing
-            clear_cuda_cache: Whether to clear CUDA cache on initialization
-            min_pages_for_split: Minimum number of pages before splitting a PDF
         """
         self.batch_multiplier = batch_multiplier
         self.langs = langs
+        self.max_pages = max_pages
+        self.start_page = start_page
+        self.workers = min(workers, multiprocessing.cpu_count())
+        self.min_length = min_length
         
         # Initialize components
         self.splitter = PDFSplitter(chunk_size, min_pages_for_split)
@@ -98,17 +112,44 @@ class PDFProcessor:
             pdf_path,
             output_path,
             "--batch_multiplier",
-            str(self.batch_multiplier),
-            "--langs",
-            self.langs
+            str(self.batch_multiplier)
         ]
+        
+        # Add optional parameters if specified
+        if self.langs:
+            command.extend(["--langs", self.langs])
+        if self.max_pages:
+            command.extend(["--max_pages", str(self.max_pages)])
+        if self.start_page:
+            command.extend(["--start_page", str(self.start_page)])
+            
+        subprocess.run(command, check=True)
+        
+    def _run_marker_batch(self, input_dir: str, output_dir: str, max_files: Optional[int] = None) -> None:
+        """Execute marker command for batch PDF processing."""
+        command = [
+            "marker",
+            input_dir,
+            output_dir,
+            "--workers",
+            str(self.workers)
+        ]
+        
+        # Add optional parameters
+        if max_files:
+            command.extend(["--max", str(max_files)])
+        if self.min_length:
+            command.extend(["--min_length", str(self.min_length)])
+            
         subprocess.run(command, check=True)
     
     def batch_process_directory(
         self,
         input_dir: str,
         output_dir: str,
-        create_zip: bool = True
+        create_zip: bool = True,
+        max_files: Optional[int] = None,
+        use_marker_batch: bool = True
     ) -> Optional[str]:
         """
         Process all PDF files in a directory.
@@ -117,14 +158,26 @@ class PDFProcessor:
             input_dir: Input directory containing PDF files
             output_dir: Output directory for markdown files
             create_zip: Whether to create a ZIP of output files
+            max_files: Maximum number of PDFs to process
+            use_marker_batch: Whether to use marker batch processing (faster) or process files individually
         
         Returns:
             Path to ZIP file if create_zip is True, None otherwise
         """
         self.file_manager.create_directory(output_dir)
-        pdf_files = self.file_manager.get_pdf_files(input_dir)
-        processed_dirs = []
         
+        if use_marker_batch:
+            self._run_marker_batch(input_dir, output_dir, max_files)
+            if create_zip:
+                return self.file_manager.create_zip([output_dir], output_dir)
+            return None
+            
+        # Individual processing fallback
+        pdf_files = self.file_manager.get_pdf_files(input_dir)
+        if max_files:
+            pdf_files = pdf_files[:max_files]
+            
+        processed_dirs = []
         for pdf_file in pdf_files:
             relative_path = self.file_manager.get_relative_path(pdf_file, input_dir)
             output_path = os.path.join(

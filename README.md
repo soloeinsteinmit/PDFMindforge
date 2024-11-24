@@ -63,7 +63,7 @@ processor.batch_process_directory(
 
 ## 📋 Requirements
 
-- Python 3.8+
+- Python 3.9+
 - PyTorch (for GPU acceleration)
 - PyPDF2
 - marker_single
