@@ -31,6 +31,7 @@ class PDFSplitter:
         Returns:
             List of paths to split PDF files
         """
+        
         os.makedirs(output_folder, exist_ok=True)
         split_files = []
         
@@ -42,6 +43,7 @@ class PDFSplitter:
             return [file_path]
             
         num_parts = (num_pages + self.chunk_size - 1) // self.chunk_size
+        print(f"Splitting {file_path} into {num_parts} parts...")
         
         for part in range(num_parts):
             pdf_writer = PdfWriter()

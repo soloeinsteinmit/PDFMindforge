@@ -55,7 +55,8 @@ class PDFProcessor:
         self,
         input_path: str,
         output_path: str,
-        split_if_large: bool = True
+        split_if_large: bool = True,
+        create_zip: bool = True
     ) -> str:
         """
         Process a single PDF file to markdown format.
@@ -64,6 +65,7 @@ class PDFProcessor:
             input_path: Path to input PDF file
             output_path: Path for output markdown files
             split_if_large: Whether to split large PDFs into chunks
+            create_zip: Whether to create a ZIP of output files
         
         Returns:
             Path to the output directory containing markdown files
@@ -83,7 +85,11 @@ class PDFProcessor:
         else:
             self._run_marker_single(input_path, output_path)
         
-        return output_path
+        if create_zip:
+            zip_path = self.file_manager.create_zip([output_path], output_path)
+            return zip_path
+        else:
+            return output_path
     
     def _run_marker_single(self, pdf_path: str, output_path: str) -> None:
         """Execute marker_single command for PDF to markdown conversion."""
@@ -111,7 +117,7 @@ class PDFProcessor:
             input_dir: Input directory containing PDF files
             output_dir: Output directory for markdown files
             create_zip: Whether to create a ZIP of output files
-            
+        
         Returns:
             Path to ZIP file if create_zip is True, None otherwise
         """
@@ -139,7 +145,7 @@ class PDFProcessor:
         Args:
             source_dir: Directory containing files to zip
             output_path: Path for output ZIP file
-            
+        
         Returns:
             Path to the created ZIP file
         """
