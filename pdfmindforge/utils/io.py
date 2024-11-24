@@ -23,7 +23,7 @@ class FileManager:
         Args:
             directory: Directory to search for PDF files
             recursive: Whether to search recursively in subdirectories
-            
+        
         Returns:
             List of paths to PDF files
         """
@@ -38,7 +38,7 @@ class FileManager:
         Args:
             source_dirs: List of directories containing files to zip
             output_path: Path for output ZIP file
-            
+        
         Returns:
             Path to the created ZIP file
         """

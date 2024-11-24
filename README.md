@@ -28,7 +28,11 @@ PDFMindforge is designed to streamline the process of converting PDF documents i
 ### Installation
 
 ```bash
+# Basic installation
 pip install pdfmindforge
+
+# Install with CUDA support (recommended for GPU acceleration)
+pip install pdfmindforge[cuda]
 ```
 
 ### Basic Usage
@@ -152,6 +156,9 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 - [ ] Progress tracking UI
 - [ ] Parallel processing optimization
 - [ ] Cloud storage integration
+- [ ] Read pdf from URL(from web)
+- [ ] Support for non-English languages
+- [ ] Split by file size option
 
 ---
 

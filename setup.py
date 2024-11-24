@@ -46,5 +46,10 @@ setup(
             "isort>=5.0",
             "flake8>=3.9",
         ],
+        "cuda": [
+            "torch>=2.4.1+cu118",  # CUDA 11.8 version
+            "torchvision>=0.15.0+cu118",
+            "torchaudio>=2.0.0+cu118"
+        ]
     }
 )
