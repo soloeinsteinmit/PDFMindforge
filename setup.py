@@ -25,7 +25,7 @@ setup(
     ],
     python_requires=">=3.8",
     install_requires=[
-        "torch>=2.4.1",
+        "torch>=2.1.1",
         "transformers>=4.46.1",
         "accelerate>=0.24.1",
         "huggingface_hub>=0.19.4",
@@ -47,9 +47,8 @@ setup(
             "flake8>=3.9",
         ],
         "cuda": [
-            "torch>=2.4.1+cu118",  # CUDA 11.8 version
-            "torchvision>=0.15.0+cu118",
-            "torchaudio>=2.0.0+cu118"
+            "torch>=2.1.1",  # Latest stable version
+            "torchvision>=0.15.0"
         ]
     }
 )
