@@ -22,21 +22,26 @@ setup(
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
         "Programming Language :: Python :: 3.10",
+        "Programming Language :: Python :: 3.11",
     ],
     python_requires=">=3.8",
     install_requires=[
-        "torch>=2.1.1",
+        "torch>=2.1.1,<2.5.0",
         "transformers>=4.46.1",
         "accelerate>=0.24.1",
         "huggingface_hub>=0.19.4",
         "safetensors",
         "tokenizers",
         "Pillow",
-        "numpy",
+        "numpy>=1.26.0,<2.0.0",
         "tqdm",
         "marker-pdf",
         "PyPDF2",
-        "zip-files"
+        "zip-files",
+        "pandas>=1.5.0,<2.1.4",
+        "google-cloud-bigquery>=3.10.0",
+        "google-cloud-storage>=2.0.0",
+        "pydantic>=1.10.0,<2.0.0"
     ],
     extras_require={
         "dev": [
