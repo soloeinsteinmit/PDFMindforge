@@ -35,13 +35,13 @@ setup(
         "Pillow",
         "numpy>=1.26.0,<2.0.0",
         "tqdm",
-        "marker-pdf",
+        "marker-pdf>=0.1.0",
         "PyPDF2",
         "zip-files",
         "pandas>=1.5.0,<2.1.4",
         "google-cloud-bigquery>=3.10.0",
         "google-cloud-storage>=2.0.0",
-        "pydantic>=1.10.0,<2.0.0"
+        "pydantic>=2.4.2,<3.0.0"
     ],
     extras_require={
         "dev": [
