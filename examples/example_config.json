@@ -1,0 +1,20 @@
+{
+    "pdf": {
+        "chunk_size": 100,
+        "batch_multiplier": 2,
+        "langs": "English",
+        "min_pages_for_split": 200,
+        "clear_cuda_cache": true
+    },
+    "gpu": {
+        "use_gpu": true,
+        "memory_limit": 4096,
+        "optimize_for_speed": true
+    },
+    "processing": {
+        "output_format": "markdown",
+        "create_zip": true,
+        "recursive_search": true,
+        "preserve_images": true
+    }
+}

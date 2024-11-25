@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Documentation 📚
+    url: https://github.com/soloeinsteinmit/PDFMindforge/tree/master/docs
+    about: Check our documentation for guides and troubleshooting
+  - name: FAQ ❓
+    url: https://github.com/soloeinsteinmit/PDFMindforge/blob/master/docs/faq.md
+    about: Common questions and answers about PDFMindforge
+  - name: Discussions 💬
+    url: https://github.com/soloeinsteinmit/PDFMindforge/discussions
+    about: Ask questions and share ideas with the community

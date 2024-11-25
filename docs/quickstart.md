@@ -1,85 +1,98 @@
 # Quick Start Guide 🚀
 
-Get started with PDFMindforge in minutes! This guide will show you the basic usage patterns.
+Get started with PDFMindforge in minutes! This guide covers basic installation and usage.
 
-## Basic Usage
+## Installation 
 
-### 1. Single PDF Processing
+Install PDFMindforge using pip:
+
+```bash
+# Basic installation
+pip install pdfmindforge
+
+# With GPU support (recommended)
+pip install pdfmindforge[cuda]
+```
+
+## Basic Usage 
+
+Here's a simple example to get you started:
 
 ```python
 from pdfmindforge import PDFProcessor
 
-# Initialize processor with default settings
+# Initialize processor
 processor = PDFProcessor()
 
 # Process a single PDF
 processor.process_pdf_to_md(
-    input_path="path/to/your.pdf",
-    output_path="path/to/output"
+    input_path="document.pdf",
+    output_path="output"
 )
 ```
 
-### 2. Batch Processing
-```python
-# Process all PDFs in a directory
-processor.batch_process_directory(
-    input_dir="path/to/pdfs",
-    output_dir="path/to/output",
-    create_zip=True  # Automatically create a ZIP archive
-)
-```
+## Batch Processing 
 
-## Configuration Options
-
-Initialize PDFProcessor with these options to customize behavior:
+Process multiple PDFs efficiently:
 
 ```python
+# Initialize with GPU optimization
 processor = PDFProcessor(
-    chunk_size=100,          # Pages per chunk when splitting
-    batch_multiplier=2,      # Batch size multiplier
-    langs="English",         # Language specification
-    clear_cuda_cache=True,   # Clear GPU memory before processing
-    min_pages_for_split=200  # Minimum pages before splitting
+    batch_multiplier=2,    # Use more VRAM for speed
+    workers=4             # Process 4 files in parallel
+)
+
+# Process directory of PDFs
+processor.batch_process_directory(
+    input_dir="pdfs",
+    output_dir="output",
+    use_marker_batch=True,  # Enable fast batch processing
+    recursive=True,         # Include subdirectories
+    create_zip=True         # Create ZIP of outputs
 )
 ```
 
-## Common Patterns
+## Common Options 
 
-### 1. Processing Large PDFs
-```python
-# Automatically splits large PDFs into manageable chunks
-processor.process_pdf_to_md(
-    input_path="large_document.pdf",
-    output_path="output_dir",
-    split_if_large=True  # Enable automatic splitting
-)
-```
+### Performance Settings
 
-### 2. Creating ZIP Archives
-```python
-# Process and create ZIP in one go
-zip_path = processor.batch_process_directory(
-    input_dir="pdf_folder",
-    output_dir="output_folder",
-    create_zip=True
-)
-print(f"Archive created at: {zip_path}")
-```
+- `batch_multiplier`: Control VRAM usage (default=2)
+- `workers`: Number of parallel workers
+- `chunk_size`: Pages per chunk when splitting
+- `clear_cuda_cache`: Manage GPU memory
 
-### 3. GPU Optimization
-```python
-from pdfmindforge.utils import GPUManager
+### Processing Options
 
-# Check GPU availability
-if GPUManager.is_cuda_available():
-    processor = PDFProcessor(
-        batch_multiplier=4,  # Increase for better GPU utilization
-        clear_cuda_cache=True
-    )
-```
+- `langs`: OCR language(s) (e.g., "English,French")
+- `min_length`: Skip PDFs with little text
+- `min_pages_for_split`: When to split large PDFs
+- `max_pages`: Limit pages to process
+- `start_page`: Starting page number
 
-## Next Steps
+## Tips for Best Results 
 
-- Check out Advanced Usage for more features
-- Read the API Reference for detailed documentation
-- Visit our GitHub repository for updates
+1. **GPU Acceleration**
+   - Install with `[gpu]` extra for faster processing
+   - Use `batch_multiplier=2` for optimal speed/memory balance
+   - Enable `clear_cuda_cache=True` for long runs
+
+2. **Large Documents**
+   - Set appropriate `min_pages_for_split`
+   - Use smaller `chunk_size` for memory efficiency
+   - Enable `split_if_large=True` when processing
+
+3. **Batch Processing**
+   - Use `use_marker_batch=True` for better performance
+   - Set `workers` based on available resources
+   - Enable `recursive=True` to process subdirectories
+
+4. **Memory Management**
+   - Each worker uses ~5GB VRAM peak
+   - Adjust `batch_multiplier` based on available RAM
+   - Use `min_length` to skip image-heavy PDFs
+
+## Next Steps 
+
+- Check out [Advanced Usage](advanced_usage.md) for more features
+- See [API Reference](api_reference.md) for detailed documentation
+- Visit our [GitHub](https://github.com/soloeinsteinmit/pdfmindforge) for updates

@@ -2,18 +2,18 @@
 
 [![PyPI version](https://badge.fury.io/py/pdfmindforge.svg)](https://badge.fury.io/py/pdfmindforge)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Python 3.8+](https://img.shields.io/badge/python-3.8+-blue.svg)](https://www.python.org/downloads/release/python-380/)
+[![Python 3.8+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/release/python-390/)
 
 Transform your PDF documents into machine-learning ready formats with intelligence and ease! 🚀
 
 ## ✨ Features
 
 - 📊 Smart PDF splitting based on content size and complexity
-- 🔄 Batch processing with multi-document support
+- 🔄 Batch processing with parallel workers (GPU-optimized)
 - 🎯 Markdown conversion with formatting preservation
 - 💨 GPU acceleration support for faster processing
 - 📦 Automatic ZIP archiving of processed documents
-- 🔍 Intelligent page threshold detection
+- 🖼️ Automatic image extraction and linking
 - 🎛️ Configurable processing parameters
 - 📈 Progress tracking and logging
 - 🛡️ Error handling and recovery
@@ -40,89 +40,116 @@ pip install pdfmindforge[cuda]
 ```python
 from pdfmindforge import PDFProcessor
 
-# Initialize processor
-processor = PDFProcessor(
-    chunk_size=100,
-    batch_multiplier=2,
-    langs="English"
-)
+# Initialize processor with optimal settings
+processor = PDFProcessor()
 
 # Process a single PDF
 processor.process_pdf_to_md(
-    input_path="path/to/your.pdf",
-    output_path="path/to/output"
+    input_path="input.pdf",
+    output_path="output_folder"
 )
 
-# Batch process an entire directory
+# Process multiple PDFs in parallel
 processor.batch_process_directory(
-    input_dir="path/to/pdfs",
-    output_dir="path/to/output",
-    create_zip=True
+    input_dir="input_folder",
+    output_dir="output_folder",
+    workers=4  # Number of parallel workers
 )
 ```
 
 ## 📋 Requirements
 
-- Python 3.8+
+- Python 3.9+
 - PyTorch (for GPU acceleration)
 - PyPDF2
 - marker_single
+
+## 📚 API Reference
+
+| Parameter | Type | Default | Description |
+|-----------|------|---------|-------------|
+| chunk_size | int | 100 | Pages per chunk when splitting PDFs |
+| batch_multiplier | int | 2 | VRAM multiplier (2 = ~6GB VRAM) |
+| langs | str | "English" | OCR language(s) |
+| clear_cuda_cache | bool | True | Clear GPU memory on init |
+| min_pages_for_split | int | 200 | When to split large PDFs |
+| max_pages | int | None | Max pages to process |
+| start_page | int | None | Starting page number |
+| workers | int | None | Parallel processing workers |
+| min_length | int | None | Min text length to process |
 
 ## 🛠️ Advanced Configuration
 
 ### GPU Acceleration
 
-PDFMindforge automatically detects and utilizes available GPU resources:
+PDFMindforge automatically detects and utilizes available GPU resources. The number of workers is optimized based on:
+- Available VRAM (each worker uses ~5GB peak)
+- CPU cores
+- Document complexity
+
+### Processing Options
 
 ```python
 processor = PDFProcessor(
-    clear_cuda_cache=True,  # Clear GPU memory before processing
-    batch_multiplier=4      # Increase for better GPU utilization
+    # Basic settings
+    chunk_size=100,              # Pages per chunk when splitting
+    batch_multiplier=2,          # VRAM multiplier (2 = ~6GB VRAM)
+    min_pages_for_split=200,     # When to split large PDFs
+    
+    # Processing control
+    max_pages=None,              # Max pages to process per PDF
+    start_page=None,             # Starting page number
+    workers=4,                   # Parallel processing workers
+    
+    # OCR settings
+    langs="English",             # OCR language(s)
+    min_length=None,            # Min text length to process
+    
+    # Resource management
+    clear_cuda_cache=True       # Clear GPU memory on init
+)
+
+# Batch processing with options
+processor.batch_process_directory(
+    input_dir="pdfs",
+    output_dir="output",
+    recursive=True,         # Search subdirectories
+    create_zip=True,        # Create ZIP archive
+    max_files=None,         # Max files to process
+    use_marker_batch=True   # Use fast batch processing
 )
 ```
-
-### Custom Splitting Rules
-
-Configure how documents are split:
-
-```python
-processor = PDFProcessor(
-    min_pages_for_split=200,  # Minimum pages before splitting
-    chunk_size=50            # Pages per chunk
-)
-```
-
-## 🔍 API Reference
-
-### PDFProcessor
-
-#### Main Methods
-
-- `process_pdf_to_md(input_path, output_path, split_if_large=True)`
-- `batch_process_directory(input_dir, output_dir, create_zip=True)`
-- `split_pdf(file_path, output_folder)`
-- `create_zip(source_dir, output_path)`
-
-#### Configuration Options
-
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| chunk_size | int | 100 | Number of pages per chunk |
-| batch_multiplier | int | 2 | Batch size multiplier |
-| langs | str | "English" | Document language |
-| min_pages_for_split | int | 200 | Minimum pages before splitting |
-| clear_cuda_cache | bool | True | Clear GPU cache on init |
 
 ## 📊 Performance Tips
 
 1. 🚀 Adjust `batch_multiplier` based on available RAM
 2. 💻 Use GPU acceleration for large documents
-3. 📈 Optimize `chunk_size` for your specific use case
-4. 🔧 Configure `min_pages_for_split` based on document complexity
+3. 📈 Enable `use_marker_batch` for processing many files
+4. 🔧 Set `min_length` to skip image-heavy PDFs
+5. 📈 Optimize `chunk_size` for your specific use case
+6. 🔧 Configure `min_pages_for_split` based on document complexity
 
-## 🤝 Contributing
+## Troubleshooting
 
-We welcome contributions! Please the [Contributing Guide](CONTRIBUTING.md) for details.
+### Common Issues
+
+1. **Out of Memory Errors**
+   - Reduce `batch_multiplier`
+   - Lower number of `workers`
+   - Enable `clear_cuda_cache`
+
+2. **Slow Processing**
+   - Enable GPU acceleration
+   - Use `use_marker_batch=True` for multiple files
+   - Set appropriate `min_length` to skip image-heavy PDFs
+
+## Documentation
+
+For detailed documentation, visit our [Documentation Site](https://docs.pdfmindforge.com). Coming soon!
+
+## Contributing
+
+We welcome contributions! Please see our [Contributing Guide](CONTRIBUTING.md) for details.
 
 ### Development Setup
 
@@ -147,19 +174,19 @@ MIT License - see the [LICENSE](LICENSE) file for details.
 - 📧 Create an issue for bug reports
 - 🌟 Star the repo if you find it useful
 - 🔄 Fork for your own modifications
+- 📞 Contact: [Solomon Eshun](mailto:solomoneshun373@gmail.com)
 
 ## 🔜 Roadmap
 
 - [ ] Multi-language support enhancement
 - [ ] Advanced OCR integration
-- [ ] Custom markdown template support
 - [ ] Progress tracking UI
 - [ ] Parallel processing optimization
 - [ ] Cloud storage integration
 - [ ] Read pdf from URL(from web)
-- [ ] Support for non-English languages
 - [ ] Split by file size option
+- And much more!
 
 ---
 
-Made with ❤️ by the Solomon Eshun
+Made with ❤️ by Solomon Eshun

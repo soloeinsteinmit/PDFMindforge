@@ -1,0 +1,21 @@
+# CUDA-enabled dependencies
+torch>=2.4.1+cu118
+torchvision>=0.15.0+cu118
+transformers>=4.46.1
+accelerate>=0.24.1
+huggingface_hub>=0.19.4
+safetensors
+tokenizers
+Pillow
+numpy
+tqdm
+marker-pdf
+PyPDF2
+zip-files
+
+# Development dependencies
+pytest>=6.0
+pytest-cov>=2.0
+black>=22.0
+isort>=5.0
+flake8>=3.9
