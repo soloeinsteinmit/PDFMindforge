@@ -20,6 +20,23 @@ class PDFSplitter:
         self.chunk_size = chunk_size
         self.min_pages_for_split = min_pages_for_split
     
+    def should_split(self, file_path: str) -> bool:
+        """
+        Check if a PDF file should be split based on its size.
+        
+        Args:
+            file_path: Path to the input PDF file
+        
+        Returns:
+            True if the PDF should be split, False otherwise
+        """
+        try:
+            pdf = PdfReader(file_path)
+            return len(pdf.pages) > self.min_pages_for_split
+        except Exception as e:
+            print(f"Error checking PDF size: {e}")
+            return False
+
     def split_pdf(self, file_path: str, output_folder: str) -> List[str]:
         """
         Split a large PDF file into smaller chunks.
@@ -35,13 +52,12 @@ class PDFSplitter:
         os.makedirs(output_folder, exist_ok=True)
         split_files = []
         
+        if not self.should_split(file_path):
+            return [file_path]
+
         pdf = PdfReader(file_path)
         num_pages = len(pdf.pages)
         
-        # Only split if pages exceed minimum threshold
-        if num_pages <= self.min_pages_for_split:
-            return [file_path]
-            
         num_parts = (num_pages + self.chunk_size - 1) // self.chunk_size
         print(f"Splitting {file_path} into {num_parts} parts...")
         
