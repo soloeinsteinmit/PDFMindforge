@@ -89,8 +89,6 @@ class PDFProcessor:
             command.extend(["--max_pages", str(self.max_pages)])
         if self.start_page:
             command.extend(["--start_page", str(self.start_page)])
-        if self.min_length:
-            command.extend(["--min_length", str(self.min_length)])
             
         subprocess.run(command, check=True)
     
