@@ -33,7 +33,7 @@ setup(
         "safetensors",
         "tokenizers",
         "Pillow",
-        "numpy>=1.26.0,<2.0.0",
+        "numpy>=2.0.0,<3.0.0",  # Compatible with cesium
         "tqdm",
         "marker-pdf>=0.1.0",
         "PyPDF2",
@@ -41,7 +41,9 @@ setup(
         "pandas>=1.5.0,<2.1.4",
         "google-cloud-bigquery>=3.10.0",
         "google-cloud-storage>=2.0.0",
-        "pydantic>=2.4.2,<3.0.0"
+        "pydantic>=2.4.2,<3.0.0",
+        "scipy>=1.4.1,<1.14.0",  # Compatible with ydata-profiling
+        "packaging>=23.1"  # Compatible with xarray and libpysal
     ],
     extras_require={
         "dev": [
